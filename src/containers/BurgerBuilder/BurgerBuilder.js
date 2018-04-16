@@ -7,6 +7,7 @@ import Modal from '../../components/UI/Modal/Modal';
 import OrderSummary from '../../components/Burger/OrderSummary/OrderSummary';
 import axios from '../../axios-orders';
 import Spinner from '../../components/UI/Spinner/Spinner'
+import withErrorHandler from '../../hoc/withErrorHandler/withErrorHandler'
 
 const INGREDIENT_PRICES = {
     salad: 0.5,
@@ -30,7 +31,7 @@ class BurgerBuilder extends Component {
         totalPrice: 4,
         purchasable: false,
         purchasing: false,
-        loading: true
+        loading: false
     }
 
     updatePurchaseState (ingredients) {
@@ -87,7 +88,7 @@ class BurgerBuilder extends Component {
         // alert('You continue!');
         this.setState({loading: true})
         const order = {
-            ingredients: this.state.ingredients,
+            ingredients: null,
             price: this.state.totalPrice,
             customer: {
                 name: 'Max Schwarzmuller',
@@ -103,14 +104,18 @@ class BurgerBuilder extends Component {
 
         axios.post('/orders.json', order)
         .then(response => {
-            console.log(response)
-            // this.setState({loading:false, purchasing:false})
-            
+            this.setState({loading:false, purchasing:false})
         })
         .catch(error=> {
-            console.log(error)
-        // this.setState({loading:false, purchasing:false})
-        console.log(this.state.loading)
+        this.setState({loading:false, purchasing:false})
+    })
+}
+
+componentDidMount(){
+    axios.get('/ingredients.json')
+    .then(response =>{
+        this.setState({ingredients: response})
+
     })
 }
 
@@ -127,12 +132,9 @@ class BurgerBuilder extends Component {
         price={this.state.totalPrice}
         purchaseCancelled={this.purchaseCancelHandler}
         purchaseContinued={this.purchaseContinueHandler} />
-
-        console.log("ORDER SUMMARY IS ORDER SUMMARY", orderSummary)
-            
-        
+          
         if(this.state.loading){
-            let orderSummary = <Spinner/>
+            orderSummary = <Spinner/>
             console.log('OrderSummary IS SPINNER',orderSummary)
         }
         // {salad: true, meat: false, ...}
@@ -154,4 +156,4 @@ class BurgerBuilder extends Component {
     }
 }
 
-export default BurgerBuilder;
+export default withErrorHandler(BurgerBuilder, axios);

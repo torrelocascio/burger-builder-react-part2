@@ -4,7 +4,7 @@ import classes from './Spinner.css'
 
 const spinner = (props) => {
   return (
-    <div className={classes.Loader}>Loading...</div>
+    <div className={classes.loader}>Loading...</div>
 
   )
 }
